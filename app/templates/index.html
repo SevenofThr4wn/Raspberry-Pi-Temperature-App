@@ -2,50 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gjames</title>
+    <title>Gjames Dashboard</title>
     <meta http-equiv="refresh" content="45">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="icon" href="https://gjames.com/sites/default/files/favicon.ico">
+    <link rel="icon" href="https://gjames.com/sites/default/files/favicon.ico" type="image/x-icon">
 </head>
 <body>
+
 <header>
-    <img src="/static/images/logo.png" width="363" height="88" alt="Gjames Logo">
-    <nav class="topnav">
+    <img src="/static/images/logo.png" alt="Gjames Logo">
+    <nav class="topnav" aria-label="Main navigation">
         <div class="flex-container">
             <a class="active" href="/">Home</a>
-            <a href="/manager_threshold">Change Threshold</a>
-            <a href="/monitordisplay">Enter Monitor View</a>
+            <a href="/manager_threshold">Threshold</a>
+            <a href="/monitordisplay">Monitor</a>
             <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
+            <a href="/signup">Sign Up</a>
             <a href="/logout">Logout</a>
         </div>
     </nav>
 </header>
 
 <main>
-    <h1><u>Dashboard</u></h1>
-    <h2 class="{{ temp_status }}">Current Status: {{ temp_status }}</h2>
-    <h2>Current Internal Temperature: {{ temp_var }} &deg;C</h2>
+    <h1>Dashboard</h1>
+    <div class="status {{ temp_status|lower }}">
+        Current Status: {{ temp_status }}
+    </div>
+    <h2>Internal Temperature: {{ temp_var }} &deg;C</h2>
 
-    <!-- Accordion Section -->
     <section>
-        <button class="accordion">Outside Temp (Source: The Bureau of Meteorology)</button>
-        <div class="panel">
-            <p>Outside Temperature: {{ outside_temp }} &deg;C</p>
-            <p>Outside Humidity: {{ outside_humidity }}%</p>
-            <p>Outside Apparent Temperature: {{ outside_AppTemp }} &deg;C</p>
+        <button class="accordion" aria-expanded="false">
+            Outside Temp (Source: BOM)
+        </button>
+        <div class="panel" hidden>
+            <p>Temperature: {{ outside_temp }} &deg;C</p>
+            <p>Humidity: {{ outside_humidity }}%</p>
+            <p>Apparent Temperature: {{ outside_AppTemp }} &deg;C</p>
         </div>
 
-        <button class="accordion">Inside Temps (Source: Integrated Hardware)</button>
-        <div class="panel">
-            <p>Inside Temperature: {{ temp_var }} &deg;C</p>
-            <p>Inside Humidity: {{ hum_var }}%</p>
-            <p>Inside Apparent Temp: {{ apparent_temp_var }} &deg;C</p>
+        <button class="accordion" aria-expanded="false">
+            Inside Temp (Source: Hardware)
+        </button>
+        <div class="panel" hidden>
+            <p>Temperature: {{ temp_var }} &deg;C</p>
+            <p>Humidity: {{ hum_var }}%</p>
+            <p>Apparent Temp: {{ apparent_temp_var }} &deg;C</p>
         </div>
 
-        <button class="accordion">Temperature Threshold</button>
-        <div class="panel">
-            <p>Temperature Threshold: {{ sql_tg }} &deg;C</p>
+        <button class="accordion" aria-expanded="false">
+            Threshold Settings
+        </button>
+        <div class="panel" hidden>
+            <p>Threshold: {{ sql_tg }} &deg;C</p>
             <p>Average Threshold: Temp &deg;C</p>
         </div>
     </section>
@@ -54,16 +64,23 @@
 <script>
     document.querySelectorAll('.accordion').forEach(button => {
         button.addEventListener('click', () => {
-            button.classList.toggle('active');
             const panel = button.nextElementSibling;
+            const isOpen = button.classList.contains('active');
 
-            if (panel.style.maxHeight) {
-                panel.style.maxHeight = null;
-            } else {
-                panel.style.maxHeight = panel.scrollHeight + "px";
+            document.querySelectorAll('.accordion').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.nextElementSibling.hidden = true;
+            });
+
+            if (!isOpen) {
+                button.classList.add('active');
+                button.setAttribute('aria-expanded', 'true');
+                panel.hidden = false;
             }
         });
     });
 </script>
+
 </body>
 </html>
